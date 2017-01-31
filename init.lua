@@ -3,9 +3,10 @@ TimerUsing = 0
 US_TO_MS = 1000
 file.open('config.txt', 'r')
 station_cfg={}
-for key, val in string.gmatch(file.read(), "(%w+)=(%w+)") do
+for key, val in string.gmatch(file.read(), "(%w+)=([%S ]+)") do
     station_cfg[key] = val
-end
+    print(key, val)
+end    
 print('config.ssid:',station_cfg.ssid)
 print('config.pwd:',station_cfg.pwd) 
 wifi.sta.config(station_cfg)
