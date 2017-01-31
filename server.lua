@@ -35,14 +35,29 @@ function handleGET (client, tarFile)
     tarFile = nil
 end
 
+JSON = 1
+ENURL = 2
 function handlePOST (client, payload)
-    client:send("this is a post request!!!", function() client:close() end) 
+    local cut, tail = payload:find('\r\n\r\n')
+    if cut then
+        local cType = ENURL
+        local header = payload:sub(1,cut)
+        for key, val in header:gmatch("(%S+):([^\n]+)") do
+            if key == 'Content-Type' then
+                cType = if val:find('json') then JSON else ENURL end
+            end
+        end
+        print('content type = ', payload:sub(tail))
+        client:send("this is a post request!!!", function() client:close() end) 
+    else
+        client:send("no params!!!", function() client:close() end)
+    end
 end
 srv:listen(80,function(conn)
     conn:on("receive", function(client, payload)
         if payload:find("GET") == 1 then
             local url = payload:match("GET +(%S+)")
-            handleGET(client, url:sub(2)) -- sub to remove /
+            handleGET(client, url:sub(2)) -- sub to remove '/'
         elseif payload:find("POST") == 1 then
             handlePOST(client, payload)
         end
