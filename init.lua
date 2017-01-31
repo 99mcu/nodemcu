@@ -5,8 +5,8 @@ file.open('config.txt', 'r')
 station_cfg={}
 for key, val in string.gmatch(file.read(), "(%w+)=([%S ]+)") do
     station_cfg[key] = val
-    print(key, val)
-end    
+end
+
 print('config.ssid:',station_cfg.ssid)
 print('config.pwd:',station_cfg.pwd) 
 wifi.sta.config(station_cfg)
@@ -17,6 +17,7 @@ tmr.register(TimerUsing, 500, tmr.ALARM_AUTO, function()
         ip = wifi.sta.getip()
         print("done, my ip is", ip)
         tmr.stop(TimerUsing)
+        dofile("server.lua")
     end
 end)
 tmr.start(TimerUsing)
