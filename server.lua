@@ -20,20 +20,30 @@ sendPayload = function(fil, cli)
   end
 end
 
+function handleGET (client, tarFile)
+    if tarFile == "" then tarFile = "index.html" end
+    local fff = file.open(tarFile, "r")
+    local name, ext = tarFile:match( "(%w+).(%w+)")
+    print(fff, name, ext)
+    local header = HEADER200:format(ext)
+    if fff then
+        client:send(header, function () sendPayload(fff, client) end)
+    else
+        client:send(HEADER404, function () client:close() end)
+    end
+    name = nil
+    tarFile = nil
+end
+
+function handlePOST (client, payload)
+    client:send("this is a post request!!!", function() client:close() end) 
+end
 srv:listen(80,function(conn)
-    conn:on("receive", function(client,payload)
-        local tarFile = string.sub(payload,string.find(payload,"GET /") +5,string.find(payload,"HTTP/") -2 )
-        if tarFile == "" then tarFile = "index.html" end
-        local fff = file.open(tarFile, "r")
-        local name, ext = tarFile:match( "(%w+).(%w+)")
-        print(fff, name, ext)
-        local header = HEADER200:format(ext)
-        if fff then
-            client:send(header, function () sendPayload(fff, client) end)
-        else
-            client:send(HEADER404, function () client:close() end)
-        end
-        name = nil
-        tarFile = nil
+    conn:on("receive", function(client, payload)
+        local method, url = payload:match("(%S+) +(%S+)")
+        local tarFile = url:sub(2)
+        print(payload, method, tarFile)
+        if method == 'GET' then handleGET(client, tarFile)
+        else handlePOST(client, payload) end
     end)
 end)
