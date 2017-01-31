@@ -18,6 +18,10 @@ tmr.register(TimerUsing, 500, tmr.ALARM_AUTO, function()
         print("done, my ip is", ip)
         tmr.stop(TimerUsing)
         dofile("server.lua")
+        for pin = 0, 8 do
+        gpio.mode(pin, gpio.OUTPUT)
+        gpio.write(pin, pin > 5 and gpio.LOW or gpio.HIGH)
+        end
     end
 end)
 tmr.start(TimerUsing)
