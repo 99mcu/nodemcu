@@ -4,6 +4,9 @@ HEADER200 = "HTTP/1.1 200 OK\r\n"..
             "Server: NodeMCU on ESP8266\r\n"..
             "Content-Type: text/%s; charset=UTF-8\r\n\r\n"
 HEADER404 = "HTTP/1.0 404 Not Found\r\n\r\nPage not found"
+HEADERJSON = "HTTP/1.1 200 OK\r\n"..
+             "Server: NodeMCU on ESP8266\r\n"..
+             "Content-Type: application/json; charset=UTF-8\r\n\r\n"
 
 sendPayload = function(fil, cli)
   local tem = fil:read()
@@ -49,9 +52,22 @@ function handlePOST (client, payload)
             end
         end
         print('type = ',cType)
-        local t = cjson.decode(body)
-        for k,v in pairs(t) do print(k,v) end
-        client:send("this is a post request!!!", function() client:close() end) 
+        if cType == JSON then
+            local t = cjson.decode(body)
+            for k,v in pairs(t) do print(k,v) end
+        else
+            print(body)
+            for k, v in body:gmatch("(%w+)=(%w+)") do
+                print(k,v)
+            end
+        end
+        client:send(HEADERJSON, function()
+            local json = {}
+            json.a = "vf"
+            json.b = 123
+            client:send(cjson.encode(json), function () client:close() end)
+            client:close()
+        end)
     else
         client:send("no params!!!", function() client:close() end)
     end
