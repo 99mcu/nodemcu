@@ -52,15 +52,19 @@ function handlePOST (client, payload)
             end
         end
         print('type = ',cType)
+        local params = {}
+        for k, v in pairs(params) do
+            print(k,v)
+        end
         if cType == JSON then
             local t = cjson.decode(body)
-            for k,v in pairs(t) do print(k,v) end
+            for k, v in pairs(t) do params[k] = v end
         else
-            print(body)
-            for k, v in body:gmatch("(%w+)=(%w+)") do
-                print(k,v)
-            end
+            for k, v in body:gmatch("(%w+)=(%w+)") do params[k] = v end
         end
+        for k, v in pairs(params) do
+            gpio.write(k, (v == 1 or v == '1') and gpio.LOW or gpio.HIGH)
+        end 
         client:send(HEADERJSON, function()
             local json = {}
             json.a = "vf"
