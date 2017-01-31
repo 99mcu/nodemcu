@@ -42,12 +42,15 @@ function handlePOST (client, payload)
     if cut then
         local cType = ENURL
         local header = payload:sub(1,cut)
+        local body = payload:sub(tail)
         for key, val in header:gmatch("(%S+):([^\n]+)") do
             if key == 'Content-Type' then
-                cType = if val:find('json') then JSON else ENURL end
+                cType = val:find('json') and JSON or ENURL
             end
         end
-        print('content type = ', payload:sub(tail))
+        print('type = ',cType)
+        local t = cjson.decode(body)
+        for k,v in pairs(t) do print(k,v) end
         client:send("this is a post request!!!", function() client:close() end) 
     else
         client:send("no params!!!", function() client:close() end)
