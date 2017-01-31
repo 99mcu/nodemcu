@@ -40,10 +40,11 @@ function handlePOST (client, payload)
 end
 srv:listen(80,function(conn)
     conn:on("receive", function(client, payload)
-        local method, url = payload:match("(%S+) +(%S+)")
-        local tarFile = url:sub(2)
-        print(payload, method, tarFile)
-        if method == 'GET' then handleGET(client, tarFile)
-        else handlePOST(client, payload) end
+        if payload:find("GET") == 1 then
+            local url = payload:match("GET +(%S+)")
+            handleGET(client, url:sub(2)) -- sub to remove /
+        elseif payload:find("POST") == 1 then
+            handlePOST(client, payload)
+        end
     end)
 end)
