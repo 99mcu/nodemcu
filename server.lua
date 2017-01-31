@@ -13,8 +13,11 @@ sendPayload = function(fil, cli)
   else
     print('close.')
     cli:close()
+    fil:close()
+    tem = nil
+    fil = nil
+    cli = nil
   end
-  collectgarbage()
 end
 
 srv:listen(80,function(conn)
@@ -23,14 +26,14 @@ srv:listen(80,function(conn)
         if tarFile == "" then tarFile = "index.html" end
         local fff = file.open(tarFile, "r")
         local name, ext = tarFile:match( "(%w+).(%w+)")
+        print(fff, name, ext)
         local header = HEADER200:format(ext)
         if fff then
             client:send(header, function () sendPayload(fff, client) end)
         else
             client:send(HEADER404, function () client:close() end)
         end
-        collectgarbage()
-        f = nil
+        name = nil
         tarFile = nil
     end)
 end)
