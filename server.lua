@@ -62,13 +62,19 @@ function handlePOST (client, payload)
         else
             for k, v in body:gmatch("(%w+)=(%w+)") do params[k] = v end
         end
-        for k, v in pairs(params) do
-            gpio.write(k, (v == 1 or v == '1') and gpio.LOW or gpio.HIGH)
-        end 
         client:send(HEADERJSON, function()
             local json = {}
-            json.a = "vf"
-            json.b = 123
+            for pin = 0, 8 do
+                local nVal = tonumber(params[pin])
+                if nVal and pin > 5 then
+                    gpio.write(pin, nVal == 1 and gpio.LOW or gpio.HIGH)
+                    print(74, nVal)
+                elseif nVal then
+                    print(76, nVal)
+                    gpio.write(pin, nVal == 1 and gpio.HIGH or gpio.LOW)
+                end
+                json[pin] = gpio.read(pin)
+            end
             client:send(cjson.encode(json), function () client:close() end)
             client:close()
         end)
