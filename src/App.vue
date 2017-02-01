@@ -1,28 +1,26 @@
 <template>
-  <div id="app">
-    <img src="./assets/logo.png">
-    <hello></hello>
+  <div>
+    <x-header :left-options="{showBack: false}">NodeMcu controls</x-header>
+    <group>
+      <x-switch title="title" v-model="value"></x-switch>
+    </group>
   </div>
 </template>
 
 <script>
-import Hello from './components/Hello'
+// import Hello from './components/Hello'
+import { Group, XHeader, XSwitch } from 'vux'
 
 export default {
   name: 'app',
   components: {
-    Hello
+    Group,
+    XHeader,
+    XSwitch
   }
 }
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style lang="less">
+  @import '~vux/src/styles/reset.less';
 </style>
